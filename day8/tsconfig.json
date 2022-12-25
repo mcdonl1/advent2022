@@ -1,0 +1,4 @@
+{
+  "exclude": ["*.old"],
+  "compilerOptions": { "target": "ES2020" }
+}

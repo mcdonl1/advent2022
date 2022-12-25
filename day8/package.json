@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "dev": "nodemon -e ts,txt main.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.11",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1"
+  }
+}

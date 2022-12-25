@@ -1,0 +1,101 @@
+const { readFileSync } = require("fs");
+
+//const inputStr: string = readFileSync("test.txt").toString();
+const inputStr: string = readFileSync("input.txt").toString();
+
+const inputArr: string[] = inputStr.split("\n");
+
+type FileSys = {
+  [key: string]: {
+    children: FileSys;
+    size: number;
+  };
+};
+let fs: FileSys = {
+  "/": {
+    children: {},
+    size: 0,
+  },
+};
+
+const setDirSize = (path: string[], size: number): void => {
+  let currentDir = fs["/"];
+  for (let i = 1; i < path.length; i++) {
+    currentDir = currentDir.children[path[i]];
+    //console.log(currentDir);
+    if (i === path.length - 1) {
+      currentDir.size = size;
+    }
+  }
+};
+
+const getDirSize = (path: string[]): number => {
+  let currentDir = fs["/"];
+  let size = 0;
+  for (let i = 1; i < path.length; i++) {
+    currentDir = currentDir.children[path[i]];
+    //console.log(currentDir);
+    if (i === path.length - 1) {
+      size = currentDir.size;
+    }
+  }
+  return size;
+};
+
+const mkdir = (path: string[]): void => {
+  let currentDir = fs["/"];
+  for (let i = 1; i < path.length; i++) {
+    //console.log(currentDir);
+    if (currentDir.children[path[i]] !== undefined) {
+      currentDir = currentDir.children[path[i]];
+      //console.log(path[i], currentDir);
+    } else {
+      currentDir.children[path[i]] = { children: {}, size: 0 };
+    }
+  }
+};
+
+let path: string[] = [];
+let size = 0;
+let ans1 = 0;
+let ansDirs: string[] = [];
+inputArr.forEach(line => {
+  const userInput = line.split(" ");
+  if (userInput[0] === "$") {
+    // Line is command
+    switch (userInput[1]) {
+      case "cd":
+        if (userInput[2] === "..") {
+          if (size > 0) {
+            setDirSize(path, size);
+            if (size <= 100000 && !ansDirs.includes(path.join())) {
+              ansDirs.push(path.join());
+              ans1 += size;
+            }
+          }
+          path.pop();
+          size = getDirSize(path);
+        } else if (userInput[2] === "/") {
+          path = ["/"];
+        } else {
+          if (size <= 100000 && !ansDirs.includes(path.join())) {
+            ansDirs.push(path.join());
+            ans1 += size;
+          }
+          path.push(userInput[2]);
+          mkdir(path);
+          size = getDirSize(path);
+        }
+      case "ls":
+        return;
+      default:
+        return;
+    }
+  } else if (!isNaN(parseInt(userInput[0]))) {
+    size += parseInt(userInput[0]);
+  }
+});
+
+console.log(JSON.stringify(fs, null, 2));
+
+console.log(`Part 1: ${ans1}`);
